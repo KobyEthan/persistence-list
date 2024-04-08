@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 const port = 3000;
 
-const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 
 const conn = new pg.Client({
   host: PGHOST,
@@ -17,19 +17,24 @@ const conn = new pg.Client({
   password: PGPASSWORD,
   port: 5432,
   ssl: "require",
+  connection: {
+    options: `project=${ENDPOINT_ID}`,
+  },
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-async function selectAll() {
-    const result = await conn.query("SELECT * FROM playing_with_neon WHERE id = 1");
-    console.log(result);
-}
-selectAll();
-
 app.get("/", async (req, res) => {
-  res.render("index.ejs");
+  try {
+    const result = await conn.query("SELECT * FROM playing_with_neon");
+    console.log(result.rows);
+    res.render("index.ejs");
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Error fetching data from database');
+  }
+
 });
 
 app.listen(port, () => {
