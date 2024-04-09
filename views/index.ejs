@@ -1,11 +1,11 @@
 <%- include('partials/header.ejs'); -%>
 
-<div class="todo-header">
+<div class="container" id="heading">
     <h2>
         <%= listHeader %>
     </h2>
 </div>
-</div class="todo-container">
+</div class="container">
     <% for (let item of listItems){%>
       <div class="item">
 
@@ -19,21 +19,27 @@
 
         <form class="edit" action="/edit" method="POST">
             <input type="hidden" name="updatedItemId" value="<%=item.id%>"/>
-            <input id="input<%=item.id%>" type="text" name="updatedItemContent" value="<%=item.title%>"/> 
+            <input id="input<%=item.id%>" type="text" name="updatedItemContent" value="<%=item.title%>" autocomplete="off"
+                autofocus="true" hidden="true"/>
+            <button id="done<%=item.id%>" class="edit-btn" type="submit" hidden>done</button>
         </form>
-
-        <button id="done<%=item.id%>" class="edit-btn" type="submit">edit</button>
+        <button id="edit<%=item.id%>" class="edit" onClick="switchBtn('<%=item.id%>')">edit</button>
       </div>
     <%}%>
 
-    <form class="newItem" action="/add" method="POST">
+    <form class="item" action="/add" method="POST">
         <input type="text" name="newItem" placeholder="Add a new Item" autocomplete="off" autofocus="true"/>
-        <button class="add-btn" type="submit" value="<%=listTitle%>">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-            </svg>              
-        </button>
+        <button class="add-btn" type="submit" name="list" value="<%=listHeader%>">add</button>
     </form>
 </div>
+
+<script>
+    function switchBtn(id) {
+      document.getElementById("content" + id).setAttribute("hidden", true)
+      document.getElementById("edit" + id).setAttribute("hidden", true)
+      document.getElementById("done" + id).removeAttribute("hidden")
+      document.getElementById("input" + id).removeAttribute("hidden")
+    }
+</script>
 
 <%- include('partials/footer.ejs'); -%>

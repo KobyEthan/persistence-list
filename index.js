@@ -15,27 +15,47 @@ app.use(express.static("public"));
 
 let items = [];
 
-app.get("/", (res) => {
-  let sql = `SELECT * FROM items`
-  db.all(sql,[], (err, rows) => {
-    if (err) return console.error(err.message);
-    rows.forEach((row) => {
-    items.push(row);
-    });
-  });
+app.get("/", (req, res) => {
+  let sql = `SELECT * FROM items`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {return console.error(err.message)};
+    items = rows;
     console.log(items);
     res.render("index.ejs", {
       listHeader: "Today",
       listItems: items,
     });
-
+  });
 });
 
-app.post("/add", async (req, res) => {
-
+app.post("/add", (req, res) => {
+  const item = req.body.newItem;
+  sql = `INSERT INTO items (content) VALUES(?)`;
+  db.run(sql,[item],(err) => {
+     if (err){return console.error(err.message)};
+     res.redirect("/");
+   }
+ );
 });
 
-app.post("/edit", async (req, res) => {});
+app.post("/edit", (req, res) => {
+  const item = req.body.updatedItemContent;
+  const id = req.body.updatedItemId;
+  sql = `UPDATE items SET content = ? WHERE id = ?`;
+    db.run(sql, [item, id], (err) => {
+   if (err) {return console.error(err.message)};
+   res.redirect("/");
+ });
+});
+
+app.post("/delete", (req, res) => {
+  const id = req.body.deletedItemId;
+  sql = `DELETE FROM items WHERE id = ?`;
+    db.run(sql, [id], (err) => {
+      if (err) {return console.error(err.message)};
+      res.redirect("/");
+    });
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

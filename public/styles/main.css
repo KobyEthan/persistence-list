@@ -3,6 +3,29 @@ html {
     background-image: -webkit-radial-gradient(75deg, #40a798 50%, #f1f1f1 50%);
 }
 
-.item{
+body{
+    display: flex;
+    flex-direction: column;
+}
+
+main{
+    text-align: center;
+    flex: 1 0 auto;
+}
+h2 {
+    color: white;
+    flex: 1 0 auto;
+}
+
+.container{
+    background-color: white;
+    max-width: 400px;
+    margin: 50px auto;
     font-family: Comic Sans MS, Comic Sans, cursive;
+    border-radius: 5px;
+    box-shadow: 5px 5px 15px -5px black;
+}
+
+#heading{
+    background-color: #7daaff;
 }

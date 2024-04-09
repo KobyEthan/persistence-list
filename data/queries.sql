@@ -6,3 +6,5 @@
 --     id INTEGER PRIMARY KEY,
 --     content varchar(100)
 -- );
+
+SELECT * FROM items;
