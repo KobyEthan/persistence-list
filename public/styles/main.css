@@ -1,0 +1,8 @@
+html {
+    background-color: #f1f1f1;
+    background-image: -webkit-radial-gradient(75deg, #40a798 50%, #f1f1f1 50%);
+}
+
+.item{
+    font-family: Comic Sans MS, Comic Sans, cursive;
+}
