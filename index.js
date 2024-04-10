@@ -16,16 +16,23 @@ app.use(express.static("public"));
 let items = [];
 
 app.get("/", (req, res) => {
-  let sql = `SELECT * FROM items`;
-  db.all(sql, [], (err, rows) => {
+  // currentList = req.body.listTitle;
+  // add currentList to the array, which will be the table that is selected from
+  let sql = `SELECT * FROM Items`;
+  db.all(sql,[], (err, rows) => {
     if (err) {return console.error(err.message)};
     items = rows;
-    console.log(items);
+
     res.render("index.ejs", {
       listHeader: "Today",
       listItems: items,
+      lists: lists,
+      });
     });
   });
+
+app.post("/new", (req, res) =>{
+
 });
 
 app.post("/add", (req, res) => {

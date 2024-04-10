@@ -1,5 +1,13 @@
 <%- include('partials/header.ejs'); -%>
 
+<div class="tab-bar">
+  <% for(let list of lists){%>
+    <button class="tablinks">Today's List</button>
+    <button class="tablinks">This Week's List</button>
+    <button class="tablinks">This Month's List</button>
+  <%}%>
+</div>
+
   <div class="box" id="heading">
     <h1>
       <%= listHeader %>

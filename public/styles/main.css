@@ -14,7 +14,26 @@ html {
     text-align: center;
     flex: 1 0 auto;
   }
-  
+
+  .tab-bar{
+      display: flex;
+      overflow: hidden;
+      background-color: #14256e;
+  }
+
+  .tab-bar button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+    color: white
+  }
+  .tab-bar button:hover{
+    background-color: gray;
+  }
   h1 {
     color: #fff;
     padding: 10px;
