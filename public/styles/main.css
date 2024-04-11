@@ -10,6 +10,7 @@ html {
     justify-content: stretch;
     min-height: 95vh;
   }
+
   main {
     text-align: center;
     flex: 1 0 auto;
@@ -126,7 +127,7 @@ html {
     color: lightgray;
     opacity: 1;
   }
-  
+
   footer {
     flex: 0 0 auto;
     color: white;

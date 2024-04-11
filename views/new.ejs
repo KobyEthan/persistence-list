@@ -1,0 +1,11 @@
+<%- include('partials/header.ejs'); -%>
+<div class="box">
+
+<h1>Add a New List!</h1>
+<form action="/new-list" method="POST">
+    <p>What is the Title of your new list?</p>
+    <input type="text" name="name">
+</form>
+</div>
+
+<%- include('partials/footer.ejs'); -%>

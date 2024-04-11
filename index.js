@@ -16,8 +16,6 @@ app.use(express.static("public"));
 let items = [];
 
 app.get("/", (req, res) => {
-  // currentList = req.body.listTitle;
-  // add currentList to the array, which will be the table that is selected from
   let sql = `SELECT * FROM Items`;
   db.all(sql,[], (err, rows) => {
     if (err) {return console.error(err.message)};
@@ -26,13 +24,23 @@ app.get("/", (req, res) => {
     res.render("index.ejs", {
       listHeader: "Today",
       listItems: items,
-      lists: lists,
       });
     });
   });
 
-app.post("/new", (req, res) =>{
+  app.get("/get-new", (req, res) =>{
+    res.render("new.ejs");
+  });
 
+app.post("/new", (req, res) =>{
+  const name = req.body.name;
+  sql = `INSERT INTO lists (name) VALUES(?)`;
+  db.run(sql,[name],(err) => {
+     if (err){return console.error(err.message)};
+     res.redirect("/");
+   }
+ );
+  
 });
 
 app.post("/add", (req, res) => {
