@@ -1,9 +1,11 @@
 <%- include('partials/header.ejs'); -%>
 
 <div class="tab-bar">
-    <button class="tablinks">Today</button>
-    <button class="tablinks">This Week</button>
-    <button class="tablinks">This Month</button>
+  <%lists.forEach(function(list){%>
+    <button class="tablinks" type="submit" name="list" value="<%=list.id%>" id="<%=list.id%>">
+      <%=list.name%>
+    </button>
+    <%});%>
     <form action="/get-new" method="GET">
       <button class="tablinks" type="submit">+</button>
     </form>
@@ -20,11 +22,9 @@
         <form action="/delete" method="post">
           <input type="checkbox" onchange="this.form.submit()" name="deletedItemId" value="<%= item.id %>">
         </form>
-
         <p id="content<%=item.id%>">
           <%= item.content %>
         </p>
-
         <form class="edit" action="/edit" method="post">
           <input type="hidden" name="updatedItemId" value="<%= item.id %>">
           <input id="input<%=item.id%>" type="text" name="updatedItemContent" value="<%= item.content %>" autocomplete="off"

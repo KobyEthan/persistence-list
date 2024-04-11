@@ -13,30 +13,52 @@ let sql;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+let currentListId = 1;
+let lists = [];
 let items = [];
 
-app.get("/", (req, res) => {
-  let sql = `SELECT * FROM Items`;
-  db.all(sql,[], (err, rows) => {
-    if (err) {return console.error(err.message)};
-    items = rows;
-
-    res.render("index.ejs", {
-      listHeader: "Today",
-      listItems: items,
-      });
+async function getItems(){
+  let sql = `SELECT * FROM items JOIN lists ON lists.id = items.list_id WHERE list_id = ?`;
+  db.all(sql, [currentListId], (err, rows) => {
+    if (err) {return console.error(err.message)}; 
+    items = []
+    rows.forEach((i) => {
+      items.push(i);
     });
   });
+  return items;
+}
 
-  app.get("/get-new", (req, res) =>{
-    res.render("new.ejs");
+async function getcurrentList(){
+  let sql = `SELECT * FROM lists`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {return console.error(err.message)}; 
+      lists = rows;
+  });
+  let currentList = lists.find((list) => list.id == currentListId)
+  return currentList;
+}
+getcurrentList();
+getItems();
+
+app.get("/", async (req, res) => {
+  const items = await getItems();
+  const currentList = await getcurrentList();
+
+  res.render("index.ejs", {
+    listItems: items,
+    lists: lists,
+    listHeader: currentList.name,
+    });
   });
 
 app.post("/new", (req, res) =>{
   const name = req.body.name;
   sql = `INSERT INTO lists (name) VALUES(?)`;
-  db.run(sql,[name],(err) => {
+  db.run(sql,[name],(err, rows) => {
      if (err){return console.error(err.message)};
+     const id = rows[0].id;
+     currentListId = id;
      res.redirect("/");
    }
  );
@@ -45,8 +67,8 @@ app.post("/new", (req, res) =>{
 
 app.post("/add", (req, res) => {
   const item = req.body.newItem;
-  sql = `INSERT INTO items (content) VALUES(?)`;
-  db.run(sql,[item],(err) => {
+  sql = `INSERT INTO items (content, list_id) VALUES(?,?)`;
+  db.run(sql,[item, currentListId],(err) => {
      if (err){return console.error(err.message)};
      res.redirect("/");
    }
