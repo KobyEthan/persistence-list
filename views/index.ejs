@@ -1,19 +1,17 @@
 <%- include('partials/header.ejs'); -%>
 
-<div class="tab-bar">
+<form class="tab-bar" action="/list" method="POST">
   <%lists.forEach(function(list){%>
     <button class="tablinks" type="submit" name="list" value="<%=list.id%>" id="<%=list.id%>">
       <%=list.name%>
     </button>
     <%});%>
-    <form action="/get-new" method="GET">
-      <button class="tablinks" type="submit">+</button>
-    </form>
-</div>
+    <input class="tablinks" type="submit" id="tab" name="add" value="+">
+  </form>
 
   <div class="box" id="heading">
     <h1>
-      <%= listHeader %>
+      <%= list.name %>
     </h1>
   </div>
   <div class="box">
@@ -38,7 +36,7 @@
       <% } %>
         <form class="item" action="/add" method="post">
           <input type="text" name="newItem" placeholder="New Item" autocomplete="off" autofocus="true" />
-          <button class="add" type="submit" name="list" value=<%=listHeader %>>+</button>
+          <button class="add" type="submit" name="list" value=<%=list.name %>>+</button>
         </form>
   </div>
 

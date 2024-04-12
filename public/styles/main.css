@@ -22,7 +22,7 @@ html {
       background-color: #14256e;
   }
 
-  .tab-bar button {
+  .tablinks{
     background-color: inherit;
     float: left;
     border: none;
@@ -32,7 +32,7 @@ html {
     font-size: 17px;
     color: white
   }
-  .tab-bar button:hover{
+  .tablinks:hover{
     background-color: gray;
   }
   h1 {

@@ -14,6 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 let currentListId = 1;
+let currentList = {};
 let lists = [];
 let items = [];
 
@@ -26,6 +27,7 @@ async function getItems(){
       items.push(i);
     });
   });
+  console.log(items);
   return items;
 }
 
@@ -35,22 +37,35 @@ async function getcurrentList(){
     if (err) {return console.error(err.message)}; 
       lists = rows;
   });
-  let currentList = lists.find((list) => list.id == currentListId)
+  currentList = lists.find((list) => list.id == currentListId)
+  console.log(currentList);
   return currentList;
 }
-getcurrentList();
-getItems();
 
 app.get("/", async (req, res) => {
-  const items = await getItems();
-  const currentList = await getcurrentList();
-
-  res.render("index.ejs", {
-    listItems: items,
-    lists: lists,
-    listHeader: currentList.name,
-    });
+    try {
+      const items = await getItems();
+      const currentList = await getcurrentList();
+  
+      res.render("index.ejs", {
+        listItems: items,
+        lists: lists,
+        list: currentList,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Internal Server Error");
+    }
   });
+
+app.post("/list", (req,res) => {
+  if (req.body.add === "new"){
+    res.render("new.ejs");
+  }else{
+    currentListId = req.body.list;
+    res.redirect("/");
+  }
+});
 
 app.post("/new", (req, res) =>{
   const name = req.body.name;
@@ -62,7 +77,6 @@ app.post("/new", (req, res) =>{
      res.redirect("/");
    }
  );
-  
 });
 
 app.post("/add", (req, res) => {
