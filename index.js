@@ -5,88 +5,122 @@ import sqlite3 from "sqlite3";
 const app = express();
 const port = 3000;
 
+// Establish database connection
 const db = new sqlite3.Database("./data/database.db", sqlite3.OPEN_READWRITE, (err) => {
-  if (err) return console.error(err.message);
-})
-let sql;
+  if (err) console.error(err.message);
+});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-let currentListId = 1;
-let currentList = {};
-let lists = [];
-let items = [];
-
-async function getItems(){
-  let sql = `SELECT * FROM items JOIN lists ON lists.id = items.list_id WHERE list_id = ?`;
-  db.all(sql, [currentListId], (err, rows) => {
-    if (err) {return console.error(err.message)}; 
-    items = []
-    rows.forEach((i) => {
-      items.push(i);
+// Function to fetch items for the current list
+async function getItems(currentListId) {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM items WHERE list_id = ?`;
+    db.all(sql, [currentListId], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
     });
   });
-  console.log(items);
-  return items;
 }
 
-async function getcurrentList(){
-  let sql = `SELECT * FROM lists`;
-  db.all(sql, [], (err, rows) => {
-    if (err) {return console.error(err.message)}; 
-      lists = rows;
+// Function to fetch a list by its ID
+async function getListById(listId) {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM lists WHERE id = ?`;
+    db.get(sql, [listId], (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
   });
-  currentList = lists.find((list) => list.id == currentListId)
-  console.log(currentList);
-  return currentList;
 }
+
+async function getAllLists(){
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM lists`;
+      db.all(sql, [], (err, row) =>{
+      if (err){
+        reject(err);
+      }else{
+        resolve(row);
+      }
+      return row;
+    });
+  });
+}
+
+
+getAllLists();
 
 app.get("/", async (req, res) => {
-    try {
-      const items = await getItems();
-      const currentList = await getcurrentList();
-  
-      res.render("index.ejs", {
-        listItems: items,
-        lists: lists,
-        list: currentList,
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Internal Server Error");
-    }
-  });
+  try {
+    const currentListId = 1;
+    const items = await getItems(currentListId);
+    const currentList = await getListById(currentListId);
+    const lists = await getAllLists();
 
-app.post("/list", (req,res) => {
-  if (req.body.add === "new"){
-    res.render("new.ejs");
-  }else{
-    currentListId = req.body.list;
-    res.redirect("/");
+    res.render("index.ejs", {
+      listItems: items,
+      currentList: currentList,
+      lists: lists,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
   }
 });
 
-app.post("/new", (req, res) =>{
-  const name = req.body.name;
-  sql = `INSERT INTO lists (name) VALUES(?)`;
-  db.run(sql,[name],(err, rows) => {
-     if (err){return console.error(err.message)};
-     const id = rows[0].id;
-     currentListId = id;
-     res.redirect("/");
-   }
- );
+app.get("/new", (req, res) => {
+  res.render("new.ejs");
+});
+
+app.get("/get-list", async (req, res) => {
+  try {
+    const listId = req.query.list;
+    const currentList = await getListById(listId);
+    const items = await getItems(listId);
+
+    res.render("index.ejs", {
+      listItems: items,
+      currentList: currentList,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/new-list", (req, res) => {
+  const newListName = req.body.newListName;
+  const sql = `INSERT INTO lists (name) VALUES (?)`;
+  db.run(sql, [newListName], function (err) {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+    res.redirect("/");
+  });
 });
 
 app.post("/add", (req, res) => {
   const item = req.body.newItem;
-  sql = `INSERT INTO items (content, list_id) VALUES(?,?)`;
-  db.run(sql,[item, currentListId],(err) => {
-     if (err){return console.error(err.message)};
-     res.redirect("/");
-   }
- );
+  const listId = req.body.listId; // Assuming you have a hidden field in your form for listId
+  const sql = `INSERT INTO items (content, list_id) VALUES (?, ?)`;
+  db.run(sql, [item, listId], (err) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+    res.redirect("/");
+  });
 });
 
 app.post("/edit", (req, res) => {

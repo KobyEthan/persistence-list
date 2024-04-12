@@ -1,11 +1,12 @@
 <%- include('partials/header.ejs'); -%>
+<div class="box" id="heading">
+<h1>New List Name:</h1>
+</div>
 <div class="box">
-
-<h1>Add a New List!</h1>
-<form action="/new-list" method="POST">
-    <p>What is the Title of your new list?</p>
-    <input type="text" name="name">
-</form>
+    <form class="edit" action="/new-list" method="POST">
+        <input type="text" id="newListName" name="newListName" autocomplete="off" autofocus="true" />
+        <button class="add" type="submit">+</button>
+      </form>
 </div>
 
 <%- include('partials/footer.ejs'); -%>
