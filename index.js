@@ -55,9 +55,6 @@ async function getAllLists(){
   });
 }
 
-
-getAllLists();
-
 app.get("/", async (req, res) => {
   try {
     const currentListId = 1;
@@ -76,8 +73,10 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.get("/new", (req, res) => {
-  res.render("new.ejs");
+app.get("/new", async (req, res) => {
+  const lists = await getAllLists();
+
+  res.render("new.ejs", {lists: lists});
 });
 
 app.get("/get-list", async (req, res) => {
@@ -85,10 +84,12 @@ app.get("/get-list", async (req, res) => {
     const listId = req.query.list;
     const currentList = await getListById(listId);
     const items = await getItems(listId);
+    const lists = await getAllLists();
 
     res.render("index.ejs", {
       listItems: items,
       currentList: currentList,
+      lists: lists,
     });
   } catch (err) {
     console.error(err);
@@ -111,7 +112,7 @@ app.post("/new-list", (req, res) => {
 
 app.post("/add", (req, res) => {
   const item = req.body.newItem;
-  const listId = req.body.listId; // Assuming you have a hidden field in your form for listId
+  const listId = req.body.listId;
   const sql = `INSERT INTO items (content, list_id) VALUES (?, ?)`;
   db.run(sql, [item, listId], (err) => {
     if (err) {
@@ -126,7 +127,7 @@ app.post("/add", (req, res) => {
 app.post("/edit", (req, res) => {
   const item = req.body.updatedItemContent;
   const id = req.body.updatedItemId;
-  sql = `UPDATE items SET content = ? WHERE id = ?`;
+  const sql = `UPDATE items SET content = ? WHERE id = ?`;
     db.run(sql, [item, id], (err) => {
    if (err) {return console.error(err.message)};
    res.redirect("/");
@@ -135,7 +136,7 @@ app.post("/edit", (req, res) => {
 
 app.post("/delete", (req, res) => {
   const id = req.body.deletedItemId;
-  sql = `DELETE FROM items WHERE id = ?`;
+  const sql = `DELETE FROM items WHERE id = ?`;
     db.run(sql, [id], (err) => {
       if (err) {return console.error(err.message)};
       res.redirect("/");
