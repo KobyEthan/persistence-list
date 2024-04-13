@@ -10,16 +10,5 @@
 </head>
 <body>
     <main>
-        
-<div class="tab-bar">
-    <form action="/get-list" method="GET">
-      <% lists.forEach(function(list) { %>
-        <button class="tablinks" type="submit" name="list" value="<%= list.id %>">
-          <%= list.name %>
-        </button>
-      <% }); %>
-    </form>
-    <button class="tablinks" type="button" onclick="window.location.href='/new'">+</button>
-  </div>
   
         

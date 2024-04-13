@@ -1,4 +1,16 @@
 <%- include('partials/header.ejs'); -%>
+        
+<div class="tab-bar">
+  <form action="/get-list" method="GET">
+    <% lists.forEach(function(list) { %>
+      <input type="hidden" name="currentListId" value="<%= currentList.id %>">
+      <button class="tablinks" type="submit" name="list" value="<%= list.id %>">
+        <%= list.name %>
+      </button>
+    <% }); %>
+  </form>
+  <button class="tablinks" type="button" onclick="window.location.href='/new'">+</button>
+</div>
 
 <div class="box" id="heading">
   <h1>
@@ -28,6 +40,13 @@
     <input type="text" name="newItem" placeholder="New Item" autocomplete="off" autofocus="true" />
     <button class="add" type="submit">+</button>
   </form>
+</div>
+
+<div class="box">
+<form action="/delete-list" method="POST">
+  <input type="hidden" name="deletedListId" value="<%= currentList.id %>">
+  <button type="submit">Delete List</button>
+</form>
 </div>
 
 <script>
