@@ -1,7 +1,6 @@
 html {
     background-color: #0f0f0f;
     background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
-    min-height: 1000px;
     font-family: "helvetica neue";
   }
   body {
@@ -20,6 +19,7 @@ html {
       display: flex;
       overflow: hidden;
       background-color: #14256e;
+      border-radius: 5px;
   }
 
   .tablinks{
@@ -103,6 +103,16 @@ html {
     background: none;
   }
   
+  button.delete{
+    min-height: 50px;
+    border-radius: 5px;
+    border-color: transparent;
+    background-color: #cd0000;
+    color: #ffffff;
+    font-size: 20px;
+    border-width: 0;
+  }
+  
   .icon {
     height: 20px;
   }
@@ -128,9 +138,15 @@ html {
     opacity: 1;
   }
 
+  .tablinks:hover,
+.add:hover,
+.edit:hover,
+.delete:hover {
+  cursor: pointer;
+}
+
   footer {
-    flex: 0 0 auto;
-    color: white;
-    text-align: center;
+    display: flex;
+    justify-content: end;
   }
   

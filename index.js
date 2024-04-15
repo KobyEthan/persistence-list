@@ -13,7 +13,7 @@ const db = new sqlite3.Database("./data/database.db", sqlite3.OPEN_READWRITE, (e
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-//get items for the current list
+// Get items for the current list
 async function getItems(currentListId) {
   return new Promise((resolve, reject) => {
     const sql = `SELECT * FROM items WHERE list_id = ?`;
@@ -26,8 +26,7 @@ async function getItems(currentListId) {
     });
   });
 }
-
-//get a list by its ID
+// Get a list by its ID
 async function getListById(listId) {
   return new Promise((resolve, reject) => {
     const sql = `SELECT * FROM lists WHERE id = ?`;
@@ -40,8 +39,7 @@ async function getListById(listId) {
     });
   });
 }
-
-//get an array of all the lists in the db
+// Get an array of all the lists in the db
 async function getAllLists(){
   return new Promise((resolve, reject) => {
     const sql = `SELECT * FROM lists`;
@@ -81,10 +79,12 @@ app.get("/", async (req, res) => {
   }
 });
 
+// Get the new.ejs file, to make a new list
 app.get("/new", async (req, res) => {
   res.render("new.ejs");
 });
 
+// Get whichever list the user selects
 app.get("/get-list", async (req, res) => {
   try {
     const listId = req.query.list;
@@ -103,6 +103,7 @@ app.get("/get-list", async (req, res) => {
   }
 });
 
+// Add a new list to the database
 app.post("/new-list", (req, res) => {
   const newListName = req.body.newListName;
   const sql = `INSERT INTO lists (name) VALUES (?)`;
@@ -129,33 +130,40 @@ app.post("/delete-list", (req, res) => {
   });
 });
 
+// Todo Item related requests:
 app.post("/add", (req, res) => {
+  const currentListId = req.body.currentListId;
   const item = req.body.newItem;
-  const listId = req.body.listId;
+  const listId = req.body.currentListId;
   const sql = `INSERT INTO items (content, list_id) VALUES (?, ?)`;
   db.run(sql, [item, listId], (err) => {
     if (err) {return console.error(err.message)};
   });
-  res.redirect("/");
+  // Display the list that had an item added
+  res.redirect(`/?currentListId=${currentListId}`);
 });
 
 app.post("/edit", (req, res) => {
+  const currentListId = req.body.currentListId;
   const item = req.body.updatedItemContent;
   const id = req.body.updatedItemId;
   const sql = `UPDATE items SET content = ? WHERE id = ?`;
     db.run(sql, [item, id], (err) => {
    if (err) {return console.error(err.message)};
  });
- res.redirect("/");
+ // Display the list that had an item edited
+ res.redirect(`/?currentListId=${currentListId}`);
 });
 
 app.post("/delete", (req, res) => {
+  const currentListId = req.body.currentListId;
   const id = req.body.deletedItemId;
   const sql = `DELETE FROM items WHERE id = ?`;
     db.run(sql, [id], (err) => {
       if (err) {return console.error(err.message)};
     });
-    res.redirect("/");
+    // Display the list that had an item deleted
+    res.redirect(`/?currentListId=${currentListId}`);
 });
 
 app.listen(port, () => {

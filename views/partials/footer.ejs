@@ -1,5 +1,9 @@
 </main>
-<footer></footer>
+<footer>
+    <form action="/delete-list" method="POST">
+    <input type="hidden" name="deletedListId" value="<%= currentList.id %>">
+    <button class="delete" type="submit">Delete List</button>
+  </form></footer>
 </body>
 
 </html>
