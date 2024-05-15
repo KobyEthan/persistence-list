@@ -6,9 +6,13 @@ const app = express();
 const port = 3000;
 
 // Establish database connection
-const db = new sqlite3.Database("./data/database.db", sqlite3.OPEN_READWRITE, (err) => {
-  if (err) console.error(err.message);
-});
+const db = new sqlite3.Database(
+  "./data/database.db",
+  sqlite3.OPEN_READWRITE,
+  (err) => {
+    if (err) console.error(err.message);
+  }
+);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -40,13 +44,13 @@ async function getListById(listId) {
   });
 }
 // Get an array of all the lists in the db
-async function getAllLists(){
+async function getAllLists() {
   return new Promise((resolve, reject) => {
     const sql = `SELECT * FROM lists`;
-      db.all(sql, [], (err, row) =>{
-      if (err){
+    db.all(sql, [], (err, row) => {
+      if (err) {
         reject(err);
-      }else{
+      } else {
         resolve(row);
       }
       return row;
@@ -118,7 +122,7 @@ app.post("/new-list", (req, res) => {
 });
 
 app.post("/delete-list", (req, res) => {
-  const listId = req.body.deletedListId; 
+  const listId = req.body.deletedListId;
   const sql = `DELETE FROM lists WHERE id = ?`;
   db.run(sql, [listId], (err) => {
     if (err) {
@@ -137,7 +141,9 @@ app.post("/add", (req, res) => {
   const listId = req.body.currentListId;
   const sql = `INSERT INTO items (content, list_id) VALUES (?, ?)`;
   db.run(sql, [item, listId], (err) => {
-    if (err) {return console.error(err.message)};
+    if (err) {
+      return console.error(err.message);
+    }
   });
   // Display the list that had an item added
   res.redirect(`/?currentListId=${currentListId}`);
@@ -148,22 +154,26 @@ app.post("/edit", (req, res) => {
   const item = req.body.updatedItemContent;
   const id = req.body.updatedItemId;
   const sql = `UPDATE items SET content = ? WHERE id = ?`;
-    db.run(sql, [item, id], (err) => {
-   if (err) {return console.error(err.message)};
- });
- // Display the list that had an item edited
- res.redirect(`/?currentListId=${currentListId}`);
+  db.run(sql, [item, id], (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+  });
+  // Display the list that had an item edited
+  res.redirect(`/?currentListId=${currentListId}`);
 });
 
 app.post("/delete", (req, res) => {
   const currentListId = req.body.currentListId;
   const id = req.body.deletedItemId;
   const sql = `DELETE FROM items WHERE id = ?`;
-    db.run(sql, [id], (err) => {
-      if (err) {return console.error(err.message)};
-    });
-    // Display the list that had an item deleted
-    res.redirect(`/?currentListId=${currentListId}`);
+  db.run(sql, [id], (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+  });
+  // Display the list that had an item deleted
+  res.redirect(`/?currentListId=${currentListId}`);
 });
 
 app.listen(port, () => {
