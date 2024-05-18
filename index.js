@@ -83,12 +83,10 @@ app.get("/", async (req, res) => {
   }
 });
 
-// Get the new.ejs file, to make a new list
 app.get("/new", async (req, res) => {
   res.render("new.ejs");
 });
 
-// Get whichever list the user selects
 app.get("/get-list", async (req, res) => {
   try {
     const listId = req.query.list;
@@ -107,7 +105,6 @@ app.get("/get-list", async (req, res) => {
   }
 });
 
-// Add a new list to the database
 app.post("/new-list", (req, res) => {
   const newListName = req.body.newListName;
   const sql = `INSERT INTO lists (name) VALUES (?)`;
@@ -121,16 +118,32 @@ app.post("/new-list", (req, res) => {
   });
 });
 
-app.post("/delete-list", (req, res) => {
+app.post("/delete-list", async (req, res) => {
   const listId = req.body.deletedListId;
   const sql = `DELETE FROM lists WHERE id = ?`;
-  db.run(sql, [listId], (err) => {
+  db.run(sql, [listId], async (err) => {
     if (err) {
       console.error(err.message);
       res.status(500).send("Internal Server Error");
       return;
     }
-    res.redirect("/");
+
+    // Check if there are any lists left
+    const remainingLists = await getAllLists();
+    if (remainingLists.length === 0) {
+      // Create a new list called "Today"
+      const createListSql = `INSERT INTO lists (name) VALUES (?)`;
+      db.run(createListSql, ["Today"], function (err) {
+        if (err) {
+          console.error(err.message);
+          res.status(500).send("Internal Server Error");
+          return;
+        }
+        res.redirect("/");
+      });
+    } else {
+      res.redirect("/");
+    }
   });
 });
 
